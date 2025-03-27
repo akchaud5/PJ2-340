@@ -1,0 +1,285 @@
+
+7
+CSE 340 SPRING 2025 Project 2
+Due: Thursday March 27 2025 by 11:59pm MST on GradeScope
+You may delay, but time will not.– Benjamin Franklin
+If debugging is the process of removing software bugs, then programming must be the process of putting them in.–
+Edsger Dijkstra
+If I had six hours to chop down a tree, I would spend the first four hours sharpening the axe.– Abraham Lincoln
+I had a running compiler and nobody would touch it. They told me computers could only do arithmetic. – Grace
+Murray Hopper (Inventor of the first compiler)
+1 General Advice
+You should read this specification document carefully. Multiple readings are recommended. Give yourself time by starting early
+and taking breaks between readings. You will digest the requirements better.
+•The answers to many of your questions can be found in this document.
+•Do not start coding until you have a complete understanding of the requirements. At the very least, do not start coding a
+task, until you have a complete understanding of the task’s requirement.
+•Ask for help early. I and the TAs can save you a lot of time if you ask for help early. You can get help with how to approach
+the project to make the solution easier and have an easier time implementing it. That said, when you ask for help, you
+should be prepared and you should have done your part. The lab and office hours schedule is posted on Canvas!
+•Have fun!
+2 Overview
+In this project, you are asked to write a C++ program that reads a description of a context free grammar, then, depending on
+the command line argument passed to the program, performs one of the following tasks (see Section 6.3 for more details on how
+to run the program with command line arguments):
+1. print the list of terminals followed by the list of non-terminals in the order in which they appear in the grammar,
+2. calculate nullable non-terminals,
+3. calculate FIRST sets,
+4. calculate FOLLOW sets ,
+5. left-factor the grammar,
+6. eliminate left recursion.
+1
+All of these tasks are defined in detail in this specification document. We provide you with code to read the command line
+argument into an integer variable. Depending on the value of the variable, your program will invoke the appropriate functionality.
+The rest of the document is organized as follows:
+1. Section 3 describes the input format (this is just syntax with no meaning).
+2. Section 4 describes what the input represents (this is the semantics or meaning of the input).
+3. Section 5 describes what the output of your program should be for each task. This is the largest section of the document.
+4. Section 6 discusses command line arguments and how you should run and test your program.
+5. Section 7 describes the grading scheme.
+6. Section 8 addresses some potential submission concerns.
+Important Note. For this project, there is a timeout that we enforce when testing submissions.
+•Programs that are functionally correct but take an inordinate amount of time can be timed out before finishing execution.
+•Write a recursive descent parser for the grammar, but DO NOT IMPLEMENT YOUR CALCULATIONS RE-
+CURSIVELY . If you try to invent a new recursive algorithm for calculating FIRST and FOLLOW sets, for example, it
+risks being timed out, and you will not get credit for test cases for which the program is timed out.
+•If you follow the algorithms covered in class for Nullable, FIRST and FOLLOW and the algorithms that I cover here for
+left-factoring and elimination of left recursion, you should have no problem with timeout even if your implementation is not
+particularly efficient.
+3 Input Format
+The following context-free grammar specifies the input format:
+Grammar → Rule-list HASH
+Rule-list → Rule Rule-list | Rule
+Id-list → ID Id-list | 
+Rule → ID ARROW Right-hand-side STAR
+Right-hand-side → Id-list | Id-list OR Right-hand-side
+The input consists of a rule list. Each rule has a left-hand side which is an ID and a right-hand side which is one or more
+Id-list’s separated with OR’s and terminated with the STAR token. An Id-list is a list of zero or more ID’sThe meaning of the
+input is explained in the Semantics section below.
+The tokens used in the above grammar description are defined by the following regular expressions:
+ID = letter (letter + digit)*
+STAR = '*'
+HASH = #
+OR = |
+ARROW = ->
+digit is the set of digits from ‘0’ through ‘9’ and letter is the upper and lower case letters ‘a’ through ‘z’ and ‘A’ through
+‘Z’. Tokens are space separated and there is at least one whitespace character between any two successive tokens. We provide a
+lexer with a getToken() function to recognize these tokens. You should use the provided lexer in you solution. You should not
+modify the provided lexer.
+2
+4 Semantics
+The input represents a context-free grammar. The ID tokens represent the terminal and non-terminals of the grammar. The
+lexemes of these ID tokens are the names of the terminals and non-terminals of the grammar. Each grammar Rule starts with
+a non-terminal symbol (the left-hand side of the rule) followed by ARROW, followed by a right-hand side which is one or more
+Id-list’s separated with OR’s. and terminated with the STAR token. If an Id-list that appears on the right-hand of a rule is empty,
+then that Id-list represents .
+The set of non-terminals for the grammar is the set of names that appear to the left of an arrow. Names that do not appear
+to the left of an arrow are terminal symbols. The start symbol of the grammar is the name of the left-hand side of the first rule
+of the grammar.
+Note that the convention of using upper-case letters for non-terminals and lower-case letters for terminals that I typically
+followed in class does not apply in this project.
+4.1 Example
+Here is an example input:
+decl -> idList colon ID *
+idList -> ID idList1 *
+idList1 -> COMMA ID idList1 | *
+#
+The list of non-terminal symbols in the order in which they appear in the grammar is:
+Non-Terminals = { decl, idList, idList1 }
+The list of terminal symbols in the order in which they appear in the grammar is:
+Terminals = { colon, ID, COMMA }
+The grammar that this input represents is the following:
+decl → idList colon ID
+idList → ID idList1
+idList1 → COMMA ID idList1 | 
+Note that even though the example shows that each rule is on a line by itself, a rule can be split into multiple lines, or even
+multiple rules can be on the same line. Your should not confuse ID which is the name of a terminal of the input grammar in this
+example with ID which is a token The following input describes the same grammar as the above example:
+decl -> idList colon ID * idList -> ID idList1 *
+idList1 ->
+COMMA ID idList1 | * #
+3
+5 Output Specifications: Tasks 1 – 5
+Parsing: There is no separate task for parsing the input. Your parser should properly parse the input and should output:
+SYNTAX ERROR !!!!!!!!!!!!!!
+if the input has a syntax error, and it should not output:
+SYNTAX ERROR !!!!!!!!!!!!!!
+if the input does not have a syntax error. There will be a deduction of 15% if your parser does not parse the input correctly.
+Your program should read the input grammar from standard input (which is done by the provided lexer code), and read
+the requested task number from the first command line argument (as stated earlier, we provide code to read the task number).
+Then, your program should calculate the requested output based on the task number and should print the results in the specified
+format for given task to standard output (stdout). The following specifies the exact requirements for each task number.
+5.1 Task 1: Printing Terminals and Non-terminals
+Task 1 simply outputs the list of terminals in the order in which they appear in the grammar rules followed by the list of
+non-terminals in the order in which they appear in the grammar rules.
+Example: For the input grammar
+decl -> idList colon ID *
+idList -> ID idList1 *
+idList1 -> *
+idList1 -> COMMA ID idList1 *
+#
+the expected output for task 1 is:
+colon ID COMMA decl idList idList1
+Example: Given the input grammar:
+decl -> idList colon ID *
+idList1 -> *
+idList1 -> COMMA ID idList1 *
+idList -> ID idList1 *
+#
+the expected output for task 1 is:
+colon ID COMMA decl idList idList1
+Note that in this example, even though the rule for idList1 is before the rule for idList, idList appears before idList1 in the
+grammar rules. To be clear, here is the grammar again with the order of each symbol added between parentheses after the first
+appearance of the symbol.
+4
+decl (1) -> idList (2) colon (3) ID (4) *
+idList1 (5) -> *
+idList1 -> COMMA (6) ID idList1 *
+idList -> ID idList1 *
+#
+5.2 Task 2: Calculate the set of nullable non-terminals
+Calculate the set of nullable non-terminals, then output the set in the following format
+Nullable = { <nullable_non_terminals> }
+where <nullable_non_terminals> should be replaced by a comma-separated list of nullable non-terminals. The list should be
+ordered according to the order in which non-terminals appear in the input grammar.
+Example: Given the input grammar:
+A-> B F C D E F *
+C -> E F *
+E -> a E *
+B -> a E *
+E -> a
+F -> *
+D -> *
+C -> D F *
+#
+the expected output for task 2 is:
+Nullable = { F, C, D }
+5.3 Task 3: Calculate FIRST Sets
+Compute the FIRST sets for all the non-terminal symbols. Then, for each of the non-terminals of the input grammar, in the order
+in which it appears in the grammar, output one line in the following format:
+FIRST(<symbol>) = { <set_elements> }
+where <symbol> should be replaced by the non-terminal name and <set_elements> should be replaced by a comma-separated
+list of elements of the set. The elements of the set should be ordered according to the order in which they appear in the grammar.
+Example: Given the input grammar:
+decl -> idList colon ID *
+idList -> ID idList1 *
+idList1 -> *
+idList1 -> COMMA ID idList1 *
+#
+5
+the expected output for task 2 is:
+FIRST(decl) = { ID }
+FIRST(idList) = { ID }
+FIRST(idList1) = { COMMA }
+5.4 Task 4: Calculate FOLLOW Sets
+Compute the FOLLOW sets for all the non-terminal symbols. Then, for each of the non-terminals of the input grammar, in the
+order in which it appears in the grammar, output one line in the following format:
+FOLLOW(<symbol>) = { <set_elements> }
+where <symbol> should be replaced by the non-terminal and <set_elements> should be replaced by the comma-separated list of
+elements of the set ordered in the following manner.
+•If EOF belongs to the set, represent it as $.
+•If EOF belongs to the set, it should be listed before any other element of the set.
+•All other elements of the set should be listed in the order in which they appear in the grammar.
+Example: Given the input grammar:
+decl -> idList colon ID *
+idList -> ID idList1 *
+idList1 -> *
+idList1 -> COMMA ID idList1 *
+#
+the expected output for task 3 is:
+FOLLOW(decl) = { $ }
+FOLLOW(idList) = { colon }
+FOLLOW(idList1) = { colon }
+5.5 Task 5: Left Factoring
+For this task, your program takes as input a grammar G and outputs a new grammar G′that is obtained by left-factoring G.
+Below, I give a motivation for left factoring, then I present an algorithm for left factoring which is followed by a step by step
+example and finally, I specify the output format for this task.
+5.5.1 Left factoring introduction
+The simple expression grammar that we have seen in class does not technically have a predictive parser. For instance the FIRST
+sets of T + E and T, which are the right-hand sides of the rules for E, are not disjoint.
+To write the parser, we looked at the common part (prefix) of the two right hand sides, the T, and started with parse_T().
+Then, we either stopped or we continued parsing + E. What we have done is essentially left factoring. We have two rules
+6
+E -> T + E
+E -> T
+and we treated them as E followed by +E or :
+E -> T ( + E | epsilon )
+By factoring the E out, we have implicitly transformed our input grammar into an equivalent grammar that has a predictive
+parser. In general, the transformation can be done explicitly and the explicit transformation is called left factoring. For the
+example above, the resulting grammar would be:
+E -> T E1
+E1 -> + E | epsilon
+In general, we can do left factoring whenever two rules for the same non-terminal have right-hand sides with a common
+non-trivial (non-empty) prefix. The general algorithm for left factoring is given in the next subsection.
+It is important to note that, in general, left-factoring by itself is not sufficient to obtain a grammar that has a predictive
+recursive descent parser but we need to do left factoring if we hope of obtain an equivalent grammar that might have a predictive
+recursive descent parser.
+5.5.2 Left factoring algorithm
+I give the general algorithm for left factoring on the next page, followed by a detailed example. Make an effort to read the
+algorithm carefully at least twice, once before going through the example and one after going through the example.
+In the algorithm, we chose α to be the longest common prefix of two or more rules for A. If there is more than one common
+prefix that is longest, then, to ensure a unique output of the algorithm, we start with the longest prefix that is first in dictionary
+order (also, see the discussion below about the output).
+Implementation note 1: The algorithm modifies the set of rules R while processing them. If you are implementing the set
+of rules as a vector that you iterate over, you should not delete items from the vector while you are iterating over it. This will
+lead to undefined behavior. You should keep that in mind in your implementation.
+Implementation note 2: The algorithm takes as input one grammar G and outputs another grammar G′. Your implemen-
+tation does not need to explicitly produce a full grammar description as output, just the rules of the resulting grammar in an
+order specified later in the text.
+Implementation note 3: The algorithm assume that the grammar is provided as separate rules. In your implementation,
+you should treat a rule like A -> B C | B D as two rules.
+Implementation note 4: The algorithms require the output to be sorted in a specified order. To that end, it assumes that
+strings are compared using C++ comparison. In C++, "ABC" is smaller than "abc" when compared.
+5.5.3 Left Factoring Example
+In the following example, the rules are numbered so that I can refer to them in the text. At the start of the algorithm, G′is
+empty and G contains all the rules.
+7
+Algorithm 1: Algorithm for left factoring
+1 Input: Grammar G = (S,R,T,NT)
+2 Output: Grammar G′= (S′,R′,T′,NT′)
+3
+4 Initialization:
+5 S′= S;
+6 R′= {};
+7 T′= T ;
+8 NT′= {};
+9 G′= (S′,R′,T′,NT′)
+10
+11 repeat
+12 forall A ∈NT do
+13 if A has two different rules with a non-empty common prefix x: A →xy and A →xy′then
+14 Let α be the longest common prefix for any two right-hand sides of rules of A (see tie breaking in text)
+15 We can divide the rules of A into two groups:
+16
+17 A →αβ1 A →γ1
+18 A →αβ2 A →γ2
+19 ... ...
+20 A →αβk A →γm
+21
+22 where none of the right-hand sides γ1,γ2,...,γm have α as a prefix.
+23
+// Remove rules with prefix α and add new rules to replace the removed rules
+24 for i = 1 to k do
+25 remove the rules A →αβi of A from R
+26 add the rule A →αAnew to R
+27 for j = 1 to m do
+28 add the rule Anew →βj to R′
+29 add Anew to NT′
+30 else
+// A has no two rules with a non-empty common prefix
+31 remove the rules of A from R and add them to R′
+32 remove A from NT and add it to NT′
+33 until NT = ∅
+34 return G′
+G':
+G: S -> C B C D A B C // 1
+A -> C B C D // 2
+A -> C B C B // 3
+A -> C B D // 4
+A -> C B B // 5
+B -> b // 6
+C -> c // 7
+D -> d // 8
+First, say we pick non-terminal S. Non-terminal S does not have two or more rules with a common non-empty prefix, so we
+add all rules of S to G′and we get:
+8

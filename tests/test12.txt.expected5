@@ -1,0 +1,10 @@
+A -> C B A2 #
+A1 -> B #
+A1 -> D #
+A2 -> B #
+A2 -> C A1 #
+A2 -> D #
+B -> b #
+C -> c #
+D -> d #
+S -> C B C D A B C #

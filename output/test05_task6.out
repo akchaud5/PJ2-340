@@ -1,0 +1,16 @@
+S -> A B e F D #
+S -> B C d E F #
+A -> A'1 #
+A'1 -> a B A'1 #
+A'1 -> A b B A'1 #
+A'1 -> #
+B -> C A #
+B -> c a a a a C b b b b A #
+C -> C'1 #
+C -> E B C'1 #
+C'1 -> c C C'1 #
+C'1 -> #
+D -> E F #
+E -> F E #
+F -> D z D #
+F -> C C #

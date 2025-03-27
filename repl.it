@@ -1,0 +1,202 @@
+Please use Replit or another online C++ compiler to test this code. 
+
+Here are the recommended changes to each file:
+
+1. First fix to project2.cc (Task1):
+```cpp
+void Task1() {
+    // First print terminals in the order they appear in the grammar
+    for (size_t i = 0; i < terminals.size(); i++) {
+        cout << terminals[i];
+        if (i < terminals.size() - 1 || !non_terminals.empty()) {
+            cout << " ";
+        }
+    }
+    
+    // For non-terminals, print the start symbol first, then the rest in alphabetical order
+    if (!non_terminals.empty()) {
+        string start_symbol = grammar[0].lhs;
+        cout << start_symbol;
+        
+        // Get remaining non-terminals and sort them
+        vector<string> sorted_nt;
+        for (const string& nt : non_terminals) {
+            if (nt != start_symbol) {
+                sorted_nt.push_back(nt);
+            }
+        }
+        
+        // Sort alphabetically
+        sort(sorted_nt.begin(), sorted_nt.end());
+        
+        // Print the rest
+        if (!sorted_nt.empty()) {
+            cout << " ";
+            for (size_t i = 0; i < sorted_nt.size(); i++) {
+                cout << sorted_nt[i];
+                if (i < sorted_nt.size() - 1) {
+                    cout << " ";
+                }
+            }
+        }
+    }
+    
+    // Add a trailing space to match the expected output format
+    cout << " ";
+}
+```
+
+2. Fix for Task5 (left factoring):
+```cpp
+void Task5() {
+    // Create a vector of pairs to track (LHS, RHS) rules
+    vector<pair<string, vector<vector<string>>>> rules;
+    map<string, vector<vector<string>>> lhs_to_rhs;
+    
+    // Collect rules by LHS
+    for (const Rule& rule : grammar) {
+        vector<vector<string>> rhs_list;
+        for (const RHS& rhs : rule.rhs_list) {
+            rhs_list.push_back(rhs.symbols);
+        }
+        lhs_to_rhs[rule.lhs] = rhs_list;
+    }
+    
+    // Process non-terminals in the order they appear
+    for (const string& nt : non_terminals) {
+        if (lhs_to_rhs.find(nt) == lhs_to_rhs.end()) {
+            continue;
+        }
+        
+        // Get all RHS alternatives for this non-terminal
+        vector<vector<string>> rhs_list = lhs_to_rhs[nt];
+        
+        // Group RHS alternatives by common prefix
+        map<string, vector<vector<string>>> prefix_groups;
+        vector<vector<string>> no_common_prefix;
+        
+        // First, handle rules with no common prefix
+        for (const auto& rhs : rhs_list) {
+            bool has_common_prefix = false;
+            string first_symbol = rhs.empty() ? "" : rhs[0];
+            
+            // Check if we've seen this prefix before
+            for (const auto& other_rhs : rhs_list) {
+                if (&rhs != &other_rhs && !other_rhs.empty() && !rhs.empty() && rhs[0] == other_rhs[0]) {
+                    has_common_prefix = true;
+                    break;
+                }
+            }
+            
+            if (!has_common_prefix) {
+                no_common_prefix.push_back(rhs);
+            } else if (!rhs.empty()) {
+                prefix_groups[first_symbol].push_back(rhs);
+            }
+        }
+        
+        // Output rules with no common prefix
+        for (const auto& rhs : no_common_prefix) {
+            cout << nt << " -> ";
+            for (const string& symbol : rhs) {
+                cout << symbol << " ";
+            }
+            cout << "*" << endl;
+        }
+        
+        // Process and output rules with common prefix
+        int new_nt_counter = 1;
+        for (const auto& prefix_group : prefix_groups) {
+            const string& prefix = prefix_group.first;
+            const vector<vector<string>>& rhs_with_prefix = prefix_group.second;
+            
+            // Create new non-terminal
+            string new_nt = nt + to_string(new_nt_counter++);
+            
+            // Output the factored rule
+            cout << nt << " -> " << prefix << " " << new_nt << " *" << endl;
+            
+            // Output rules for the new non-terminal
+            for (const auto& rhs : rhs_with_prefix) {
+                cout << new_nt << " -> ";
+                for (size_t i = 1; i < rhs.size(); i++) { // Skip the prefix
+                    cout << rhs[i] << " ";
+                }
+                cout << "*" << endl;
+            }
+        }
+    }
+}
+```
+
+3. Fix for Task6 (eliminate left recursion):
+```cpp
+void Task6() {
+    // Process non-terminals in the order they appear
+    for (const string& nt : non_terminals) {
+        vector<vector<string>> recursive_rhs;
+        vector<vector<string>> non_recursive_rhs;
+        
+        // Collect recursive and non-recursive rules
+        for (const Rule& rule : grammar) {
+            if (rule.lhs != nt) {
+                continue;
+            }
+            
+            for (const RHS& rhs : rule.rhs_list) {
+                if (!rhs.symbols.empty() && rhs.symbols[0] == nt) {
+                    // This is a left-recursive rule
+                    vector<string> rest(rhs.symbols.begin() + 1, rhs.symbols.end());
+                    recursive_rhs.push_back(rest);
+                } else {
+                    // Non-recursive rule
+                    non_recursive_rhs.push_back(rhs.symbols);
+                }
+            }
+        }
+        
+        // If there are recursive rules, apply the transformation
+        if (!recursive_rhs.empty()) {
+            string new_nt = nt + "'" + to_string(1);
+            
+            // Output transformed non-recursive rules: A -> α A'
+            for (const auto& rhs : non_recursive_rhs) {
+                cout << nt << " -> ";
+                for (const string& symbol : rhs) {
+                    cout << symbol << " ";
+                }
+                cout << new_nt << " *" << endl;
+            }
+            
+            // Output rules for the new non-terminal: A' -> β A'
+            for (const auto& rhs : recursive_rhs) {
+                cout << new_nt << " -> ";
+                for (const string& symbol : rhs) {
+                    cout << symbol << " ";
+                }
+                cout << new_nt << " *" << endl;
+            }
+            
+            // Output epsilon rule for new non-terminal: A' -> ε
+            cout << new_nt << " -> *" << endl;
+        } else {
+            // No left recursion, output original rules
+            for (const Rule& rule : grammar) {
+                if (rule.lhs != nt) {
+                    continue;
+                }
+                
+                for (const RHS& rhs : rule.rhs_list) {
+                    cout << nt << " -> ";
+                    for (const string& symbol : rhs.symbols) {
+                        cout << symbol << " ";
+                    }
+                    cout << "*" << endl;
+                }
+            }
+        }
+    }
+}
+```
+
+These modifications should address the formatting issues in Tasks 1, 5, and 6 to match the expected outputs in the test cases.

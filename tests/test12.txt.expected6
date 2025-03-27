@@ -1,0 +1,8 @@
+A -> C B B #
+A -> C B C B #
+A -> C B C D #
+A -> C B D #
+B -> b #
+C -> c #
+D -> d #
+S -> c B C D A B C #

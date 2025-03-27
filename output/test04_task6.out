@@ -1,0 +1,27 @@
+A -> B C Q q r #
+B -> C U P #
+C -> S T O R E #
+C -> k C #
+D -> R E A D #
+E -> H j #
+F1 ->  #
+F1 -> A I R F1 #
+G -> H Q #
+H -> I R I B #
+I -> S T O R E U P C Q q r B C D E F G H I j k l m n O P Q R S T U V W X Y Z #
+I -> k C U P C Q q r B C D E F G H I j k l m n O P Q R S T U V W X Y Z #
+O -> Z Y X W V U T S R Q P O n m l k j I H G F E D C B A #
+P -> S T O R E U P C Q q r B C D E F G H I j k l m n O P Q R S T U V W X Y Z R Q #
+P -> k C U P C Q q r B C D E F G H I j k l m n O P Q R S T U V W X Y Z R Q #
+Q -> S T O R E S E #
+Q -> k C S E #
+R -> S T O R E U P C Q q r R A R A t #
+R -> k C U P C Q q r R A R A t #
+S -> Y X A #
+T -> Y X A D d #
+U -> V W #
+V -> W #
+W -> X #
+X -> Y Z #
+Y1 ->  #
+Y1 -> Z W B i S O F T Y1 #

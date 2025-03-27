@@ -1,0 +1,9 @@
+S -> D B C D A B C *
+A -> D B C D *
+B -> A B C B *
+C -> B D *
+A -> C B B *
+B -> b *
+C -> c *
+D -> d *
+#

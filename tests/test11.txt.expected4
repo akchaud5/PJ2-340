@@ -1,0 +1,5 @@
+FOLLOW(S) = { $ }
+FOLLOW(D) = { $, b, c, d }
+FOLLOW(B) = { b, c, d }
+FOLLOW(C) = { $, b, c, d }
+FOLLOW(A) = { b, c, d }

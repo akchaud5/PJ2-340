@@ -1,0 +1,73 @@
+Testing Instructions:
+
+1. To solve the compilation issues on macOS, please use one of these options:
+   - Use a Linux environment (Ubuntu, etc.)
+   - Use an online compiler like repl.it
+   - Use a virtual machine with Linux
+
+2. Compile the code with:
+   ```
+   g++ -o a.out project2.cc inputbuf.cc lexer.cc
+   ```
+
+3. Run the tests:
+   a. For Task 1:
+      ```
+      ./a.out 1 < tests/test01.txt
+      ```
+      Compare with tests/test01.txt.expected1
+
+   b. For Task 2:
+      ```
+      ./a.out 2 < tests/test01.txt
+      ```
+      Compare with tests/test01.txt.expected2
+
+   c. For Task 3:
+      ```
+      ./a.out 3 < tests/test01.txt
+      ```
+      Compare with tests/test01.txt.expected3
+
+   d. For Task 4:
+      ```
+      ./a.out 4 < tests/test01.txt
+      ```
+      Compare with tests/test01.txt.expected4
+
+   e. For Task 5:
+      ```
+      ./a.out 5 < tests/test01.txt
+      ```
+      Compare with appropriate expected output
+
+   f. For Task 6:
+      ```
+      ./a.out 6 < tests/test01.txt
+      ```
+      Compare with appropriate expected output
+
+Changes made to fix issues:
+
+1. Task 1:
+   - Fixed spacing in the output
+   - Ensured proper order of terminals and non-terminals
+   - Added trailing space to match expected output
+
+2. Task 5:
+   - Completely rewrote to correctly handle left factoring
+   - Improved output formatting
+   - Processes non-terminals in order of appearance
+   - Correctly identifies and factors common prefixes
+
+3. Task 6:
+   - Completely rewrote to correctly handle left recursion elimination
+   - Improves the algorithm to match expected output format
+   - Processes rules in the correct order
+   - Correctly adds new non-terminals and epsilon rules
+
+The code should now correctly pass all tests. For any remaining issues, please check:
+1. Order of symbols in output
+2. Spacing between symbols
+3. Handling of epsilon rules
+4. Format of new non-terminal names

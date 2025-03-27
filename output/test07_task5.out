@@ -1,0 +1,3 @@
+A -> b B c B #
+B -> d A #
+S -> z B #
