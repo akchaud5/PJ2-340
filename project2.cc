@@ -168,30 +168,14 @@ void Task1() {
         }
     }
     
-    // For non-terminals, print the start symbol first, then the rest in alphabetical order
+    // For non-terminals, follow the order in the test cases
+    // This requires preserving the original order rather than sorting alphabetically
     if (!non_terminals.empty()) {
-        string start_symbol = grammar[0].lhs;
-        cout << start_symbol;
-        
-        // Get remaining non-terminals and sort them
-        vector<string> sorted_nt;
-        for (const string& nt : non_terminals) {
-            if (nt != start_symbol) {
-                sorted_nt.push_back(nt);
-            }
-        }
-        
-        // Sort alphabetically
-        sort(sorted_nt.begin(), sorted_nt.end());
-        
-        // Print the rest
-        if (!sorted_nt.empty()) {
-            cout << " ";
-            for (size_t i = 0; i < sorted_nt.size(); i++) {
-                cout << sorted_nt[i];
-                if (i < sorted_nt.size() - 1) {
-                    cout << " ";
-                }
+        // Print non-terminals in the order they appear in the grammar
+        for (size_t i = 0; i < non_terminals.size(); i++) {
+            cout << non_terminals[i];
+            if (i < non_terminals.size() - 1) {
+                cout << " ";
             }
         }
     }
@@ -264,14 +248,14 @@ void Task2() {
         }
     }
     
-    // Print in specified format
+    // Print in specified format with adjusted spacing to match expected output
     cout << "Nullable = {";
     if (!nullable_nts.empty()) {
         cout << " ";
         for (size_t i = 0; i < nullable_nts.size(); i++) {
             cout << nullable_nts[i];
             if (i < nullable_nts.size() - 1) {
-                cout << ", ";
+                cout << " , ";
             }
         }
         cout << " ";
@@ -617,7 +601,7 @@ void Task5() {
             for (const string& symbol : rhs) {
                 cout << symbol << " ";
             }
-            cout << "*" << endl;
+            cout << "#" << endl;
         }
         
         // Process and output rules with common prefix
@@ -630,7 +614,7 @@ void Task5() {
             string new_nt = nt + to_string(new_nt_counter++);
             
             // Output the factored rule
-            cout << nt << " -> " << prefix << " " << new_nt << " *" << endl;
+            cout << nt << " -> " << prefix << " " << new_nt << " #" << endl;
             
             // Output rules for the new non-terminal
             for (const auto& rhs : rhs_with_prefix) {
@@ -638,7 +622,7 @@ void Task5() {
                 for (size_t i = 1; i < rhs.size(); i++) { // Skip the prefix
                     cout << rhs[i] << " ";
                 }
-                cout << "*" << endl;
+                cout << "#" << endl;
             }
         }
     }
@@ -684,7 +668,7 @@ void Task6() {
                 for (const string& symbol : rhs) {
                     cout << symbol << " ";
                 }
-                cout << new_nt << " *" << endl;
+                cout << new_nt << " #" << endl;
             }
             
             // Output rules for the new non-terminal: A' -> β A'
@@ -693,11 +677,11 @@ void Task6() {
                 for (const string& symbol : rhs) {
                     cout << symbol << " ";
                 }
-                cout << new_nt << " *" << endl;
+                cout << new_nt << " #" << endl;
             }
             
             // Output epsilon rule for new non-terminal: A' -> ε
-            cout << new_nt << " -> *" << endl;
+            cout << new_nt << " -> #" << endl;
         } else {
             // No left recursion, output original rules
             for (const Rule& rule : grammar) {
@@ -710,7 +694,7 @@ void Task6() {
                     for (const string& symbol : rhs.symbols) {
                         cout << symbol << " ";
                     }
-                    cout << "*" << endl;
+                    cout << "#" << endl;
                 }
             }
         }
